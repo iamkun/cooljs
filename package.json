@@ -1,0 +1,24 @@
+{
+  "name": "cooljs",
+  "version": "1.0.1",
+  "description": "cooljs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamkun/cooljs.git"
+  },
+  "keywords": [
+    "canvas",
+    "animation",
+    "engine"
+  ],
+  "author": "iamkun",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamkun/cooljs/issues"
+  },
+  "homepage": "https://github.com/iamkun/cooljs#readme"
+}
