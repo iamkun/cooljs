@@ -1,4 +1,5 @@
 import * as utils from './utils'
+import Tween from './tween'
 
 const { requestAnimationFrameTool, isFunction, isTouchDevice } = utils
 
@@ -331,37 +332,58 @@ export default class Engine {
     this.timeMovementFinishArr = []
   }
 
-  getTimeMovement(name, process, before, after) {
+  getTimeMovement(name, value, render, option = {}) {
+    const { before, after } = option
+    const timingFunc = Tween[option.easing || 'linear']
+    const movementInstanceName = option.name || 'default'
     const movement = this.timeMovement[name]
     if (!movement) {
       return
     }
     if (!movement.processing) {
       this.timeMovementStartArr.push(name)
-      before && before(movement.store)
+      movement.store[movementInstanceName] = []
+      value.forEach((v) => {
+        movement.store[movementInstanceName].push({
+          start: parseFloat(v[0]),
+          end: parseFloat(v[1])
+        })
+      })
+      before && before()
+    }
+    const processRender = (lastRender = false) => {
+      const { duration } = movement
+      let t = duration
+      if (!lastRender) {
+        const currentTime = this.utils.getCurrentTime()
+        const { startTime } = movement
+        t = currentTime - startTime
+      }
+      const values = movement.store[movementInstanceName]
+        .map(v => timingFunc(t, v.start, v.end - v.start, duration))
+      render.apply(this, values)
     }
     if (this.checkTimeMovement(name)) {
-      process()
+      processRender()
     } else {
       this.timeMovementFinishArr.push(name)
-      after && after(movement.store)
+      processRender(true)
+      after && after()
     }
   }
 
   checkTimeMovement(name) {
     const movement = this.timeMovement[name] || {}
-    return this.utils.getCurrentTime() <= movement.time
+    return this.utils.getCurrentTime() <= movement.endTime
   }
 
   setTimeMovement(name, duration) {
+    const currentTime = this.utils.getCurrentTime()
     this.timeMovement[name] = {
-      time: this.utils.getCurrentTime() + duration,
-      store: {
-        pixelsPerFrame: distance => (
-          (distance * duration) / 1000
-        ),
-        state: []
-      }
+      startTime: currentTime,
+      endTime: currentTime + duration,
+      duration,
+      store: {}
     }
   }
 
