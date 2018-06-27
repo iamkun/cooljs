@@ -1,6 +1,6 @@
 export default class Instance {
   constructor(option = {}) {
-    const { name, painter, action } = option
+    const { name, painter, action, trigger } = option
     this.name = name
     this.x = 0
     this.y = 0
@@ -13,6 +13,7 @@ export default class Instance {
     this.visible = true
     this.painter = painter || null
     this.action = action || null
+    this.trigger = trigger || null
     this.ready = false
   }
 
