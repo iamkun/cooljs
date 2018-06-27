@@ -35,6 +35,7 @@ export default class Engine {
     this.layerArr = [this.defaultLayer]
     this.instancesObj = {}
     this.instancesObj[this.defaultLayer] = []
+    this.instancesReactionArr = []
     this.utils = utils
     this.customVariable = {}
     const self = this
@@ -117,6 +118,20 @@ export default class Engine {
     }
   }
 
+  triggerReaction(x, y) {
+    let calX = x
+    let calY = y
+    if (this.highResolution) {
+      calX *= 2
+      calY *= 2
+    }
+    this.instancesReactionArr.forEach((i) => {
+      if (!i.visible) return
+      if (calX >= i.x && calX<= i.x + i.width && calY >= i.y && calY<= i.y + i.height) {
+        i.trigger(i, this)
+      }
+    })
+  }
 
   addAudio(name, src, retry = 0) {
     if (!this.soundOn) return
@@ -273,6 +288,13 @@ export default class Engine {
           break
       }
     })
+    this.instancesReactionArr.forEach((i) => {
+      if (!i.visible) return
+      this.ctx.strokeStyle = 'red'
+      this.ctx.beginPath()
+      this.ctx.rect(i.x, i.y, i.width, i.height)
+      this.ctx.stroke()
+    })
   }
 
   drawDebugLine(x, y) {
@@ -408,6 +430,7 @@ export default class Engine {
 
   addInstance(instance, layer = this.defaultLayer) {
     this.instancesObj[layer].push(instance)
+    if (instance.trigger) this.instancesReactionArr.push(instance)
   }
 
   getInstance(name, layer = this.defaultLayer) {
@@ -415,8 +438,12 @@ export default class Engine {
   }
 
   removeInstance(name, layer = this.defaultLayer) {
-    if (this.getInstance(name, layer)) {
+    const instance = this.getInstance(name, layer)
+    if (instance) {
       this.instancesObj[layer] = this.instancesObj[layer].filter(i => i.name !== name)
+      if (instance.trigger) {
+        this.instancesReactionArr = this.instancesReactionArr.filter(i => i.name !== name)
+      }
     }
   }
 

@@ -4,7 +4,15 @@ cache:
     - ~/.npm
     - node_modules
 node_js:
-  - '6'
+  - '8'
+
+script:
+  - npm test
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ] && [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+      npx semantic-release;
+    fi
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
