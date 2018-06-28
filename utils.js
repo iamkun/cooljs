@@ -1,4 +1,4 @@
-export const getCurrentTime = () => (performance.now() * 1000)
+export const getCurrentTime = () => (performance.now())
 
 export const random = (min, max) => (Math.random() * (max - min)) + min
 
